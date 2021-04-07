@@ -187,10 +187,9 @@
       //GRADO
       function grado($array) {
         $grado = 0;
-        foreach (array_reverse(array_reverse($array, true), false) as $key => $value) {
-          if ($value != 0 && $grado == 0) {
-            $grado = count($array) - $key - 1;
-          }
+        $array = poly_cls($array);
+        if (!empty($array)) {
+          $grado = max(array_keys($array));
         }
         return $grado;
       }
@@ -339,6 +338,7 @@
         }
         //DERIVATA DI UN POLINOMIO
         function der($poly) {
+          $poly = poly_cls($poly);
           foreach ($poly as $key => $value) {
             if ($key != 0) {
               $der[$key - 1] = $value * $key;
