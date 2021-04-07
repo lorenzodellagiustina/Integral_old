@@ -130,14 +130,32 @@ CONTENT
 /*
 TABLE
 */
-tr,td {
-  width: 15px;
+tr.quoz {
   height: 15px;
   text-align: center;
-  border-width: 1px;
+}
+
+td.quoz {
+  border-width: 0px 1px 1px 0px;
   border-style: solid;
   border-color: #e5e5e5;
-  padding: 0px;
+  padding: 10px;
+}
+
+tbody tr.quoz:nth-of-type(odd) > td.quoz:nth-child(1) {
+  border-width: 0px 1px 0px 0px;
+}
+
+td.quoz:nth-child(2) {
+  border-width: 0px 0px 1px 0px;
+}
+
+tr.quoz:nth-child(2) > td.quoz:nth-child(2) {
+  border-width: 0px;
+}
+
+tr.quoz:last-child {
+  border-width: 0px;
 }
 
 table {

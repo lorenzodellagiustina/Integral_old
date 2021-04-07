@@ -135,7 +135,8 @@
       $d[0] = 0;
     }*/
 
-    echo '       <div id="phTitle"><b>OUTPUT</b></div>';
+    echo '
+        <div id="phTitle"><b>OUTPUT</b></div>';
 
 
     //FUNCTIONS
@@ -216,8 +217,8 @@
         return $molt;
       }
       //DIVISIONE TRA POLINOMI
-        //QUOZIONE
-        function quoz($num, $den) {
+        //QUOZIENTE
+        function quoz($num, $den, $print) {
           $temp_prev = $num;
           $grado_temp = grado($num);
           $grado_den = grado($den);
@@ -228,6 +229,76 @@
             $grado_temp = grado($temp);
             $temp_prev = $temp;
             unset($temp);
+            $count = 1;
+          }
+          $q_temp = $q;
+          unset($q);
+          unset($temp_prev);
+          unset($grado_temp);
+          $temp_prev = $num;
+          $grado_temp = grado($num);
+          if ($print) {
+            echo '
+          <table>
+            <tr class="quoz">
+              <td class="quoz">';
+            echo_pol($temp_prev);
+            echo '
+              </td>
+              <td class="quoz">';
+            echo_pol($den);
+            echo '
+              </td>
+            </tr>';
+          }
+          $count = 0;
+          while ($grado_temp >= $grado_den) {
+            $q[$grado_temp - $grado_den] = $temp_prev[$grado_temp] / $den[$grado_den];
+            $temp = molt($q[$grado_temp - $grado_den], $grado_temp - $grado_den, $den);
+            if ($print) {
+              if ($count == 0) {
+                echo '
+            <tr class="quoz">
+              <td class="quoz">
+                - (';
+                echo_pol($temp);
+                echo '
+                )
+              </td>
+              <td class="quoz">';
+                echo_pol($q_temp);
+              echo '
+              </td>
+            </tr>';
+              } else {
+                echo '
+            <tr class="quoz">
+              <td class="quoz">
+                - (';
+                echo_pol($temp);
+                echo '
+                )
+              </td>
+            </tr>';
+              }
+            }
+            $temp = diff($temp_prev, $temp);
+            $grado_temp = grado($temp);
+            $temp_prev = $temp;
+            unset($temp);
+            if ($print) {
+              echo '
+              <tr class="quoz">
+                <td class="quoz">';
+              echo_pol($temp_prev);
+              echo '
+              </td>
+            </tr>';
+            }
+            $count = 1;
+          }
+          if ($print) {
+            echo '</tr><table>';
           }
           return $q;
         }
@@ -259,9 +330,10 @@
     if($grado_n >= $grado_d){
       echo 'Il grado di N(x) &egrave; maggiore o uguale a quello di D(x).<br><br>';
       //CALCOLO IL QUOZIENTE Q(x) E IL RESTO R(x)
-      $q = quoz($n, $d);
+      echo 'Calcoliamo il quoziente e il resto della divisione polinomiale tra N(x) e D(x):<br><br>';
+      $q = quoz($n, $d, true);
       $r = resto($n, $d);
-      echo 'Calcoliamo il quoziente e il resto della divisione polinomiale tra N(x) e D(x):<br>Q(x)=';
+      echo '<br>Q(x)=';
       echo_pol($q);
       echo '<br>R(x)=';
       echo_pol($r);
@@ -283,5 +355,4 @@
   </body>
 </html>
 ';
-//gggggggggggggggggggggggggggggggg
 ?>
