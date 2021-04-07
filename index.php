@@ -140,6 +140,13 @@
 
 
     //FUNCTIONS
+      //DIVISIONE COME FRAZIONE
+      function frac($num, $den) {
+        $gcd = gmp_gcd($num, $den);
+        $num = $num / $gcd;
+        $den = $den / $gcd;
+        return '<div class="frac"><span>'.$num.'</span><span class="symbol">/</span><span class="bottom">'.$den.'</span></div>';
+      }
       //STAMPA POLINOMIO
       function echo_pol($array) {
         ksort($array, 1);
@@ -168,7 +175,15 @@
           $k = 1;
         }
       }
-
+      //"PULIZIA" ARRAY POLINOMIALE
+      function poly_cls($poly) {
+        foreach ($poly as $key => $value) {
+          if ($value == 0) {
+            unset($poly[$key]);
+          }
+        }
+        return $poly;
+      }
       //GRADO
       function grado($array) {
         $grado = 0;
@@ -290,7 +305,12 @@
               echo '
               <tr class="quoz">
                 <td class="quoz">';
-              echo_pol($temp_prev);
+              $temp_prev = poly_cls($temp_prev);
+              if (empty($temp_prev)){
+                echo '0';
+              } else {
+                echo_pol($temp_prev);
+              }
               echo '
               </td>
             </tr>';
@@ -317,7 +337,15 @@
           }
           return $temp_prev;
         }
-
+        //DERIVATA DI UN POLINOMIO
+        function der($poly) {
+          foreach ($poly as $key => $value) {
+            if ($key != 0) {
+              $der[$key - 1] = $value * $key;
+            }
+          }
+          return $der;
+        }
 
     //TROVO IL GRADO DI N(x) E DI D(x)
       //N(x)
@@ -326,8 +354,8 @@
       //D(x)
       $grado_d = grado($d);
       echo 'Il grado di D(x) &egrave; '.$grado_d.'.<br>';
-    //grado_n > grado_d
-    if($grado_n >= $grado_d){
+    //grado_n >= grado_d
+    if($grado_n >= $grado_d) {
       echo 'Il grado di N(x) &egrave; maggiore o uguale a quello di D(x).<br><br>';
       //CALCOLO IL QUOZIENTE Q(x) E IL RESTO R(x)
       echo 'Calcoliamo il quoziente e il resto della divisione polinomiale tra N(x) e D(x):<br><br>';
@@ -345,7 +373,38 @@
       echo_pol($d);
       echo ')';
     }
-
+  //grado_d < grado_n
+    else {
+      echo 'Il grado di N(x) &egrave; minore a quello di D(x).<br><br>';
+      //IL NUMERATORE È LA DERIVATA DEL DENOMINATORE
+      $n = poly_cls($n);
+      $d = poly_cls($d);
+      if (count(poly_cls(quoz(der($d), $n, false))) <= 1 && empty(poly_cls(resto(der($d), $n)))) {
+        echo '<b>Il numeratore è la derivata del denominatore</b>:<center>D[';
+        echo_pol($d);
+        echo '] = ';
+        echo_pol(der($d));
+        if (poly_cls(quoz(der($d), $n, false))[0] != 1) {
+          echo ' = '.poly_cls(quoz(der($d), $n, false))[0].' * ';
+          echo_pol($n);
+        }
+        echo '</center>Quindi:<center>&#8747; <div class="frac"><span>';
+        echo_pol($n);
+        echo '</span><span class="symbol">/</span><span class="bottom">';
+        echo_pol($d);
+        echo '</span></div> dx';
+        if (poly_cls(quoz(der($d), $n, false))[0] != 1) {
+          echo ' = '.poly_cls(quoz($n, der($d), false))[0].' * &#8747; <div class="frac"><span>';
+          echo_pol(der($d));
+          echo '</span><span class="symbol">/</span><span class="bottom">';
+          echo_pol($d);
+          echo '</span></div> dx';
+        }
+        echo ' = '.poly_cls(quoz($n, der($d), false))[0].' * ln|';
+        echo_pol($d);
+        echo '| + c';
+      }
+    }
   } else {
     echo '       <div id="phTitle"><b>OUTPUT</b></div>
       Inserire i dati richiesti nella sezione input!';
