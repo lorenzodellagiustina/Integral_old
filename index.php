@@ -44,12 +44,22 @@
     <div id="content">
       <div id="ph1">
         <div id="phTitle"><b>COSA FA?</b></div>
-        Crea una tabella con la successione richiesta, nell\'ordine richiesto.
+        Trova l\'integrale di una funzione razionale fratta:
+        <center>&#8747; <div class="frac"><span>N(x)</span><span class="symbol">/</span><span class="bottom">D(x)</div> dx,</center>
+        dove il numeratore N(x) e il denominatore D(x) sono dei polinomi.
       </div>
       <div id="ph2">
         <div id="phTitle"><b>INPUT</b></div>
         <form method="post" action="index.php">
-          N(x): <input type="number" name="n3" ';
+          N(x): <input type="number" name="n5" ';
+          if (isset($_POST['n5'])) {
+            echo 'value="'.$_POST['n5'].'"';
+          }
+          echo '> x<sup>5</sup> + <input type="number" name="n4" ';
+          if (isset($_POST['n4'])) {
+            echo 'value="'.$_POST['n4'].'"';
+          }
+          echo '> x<sup>4</sup> + <input type="number" name="n3" ';
           if (isset($_POST['n3'])) {
             echo 'value="'.$_POST['n3'].'"';
           }
@@ -66,7 +76,15 @@
             echo 'value="'.$_POST['n0'].'"';
           }
           echo '><br>
-          D(x): <input type="number" name="d3" ';
+          D(x): <input type="number" name="d5" ';
+          if (isset($_POST['d5'])) {
+            echo 'value="'.$_POST['d5'].'"';
+          }
+          echo '> x<sup>5</sup> + <input type="number" name="d4" ';
+          if (isset($_POST['d4'])) {
+            echo 'value="'.$_POST['d4'].'"';
+          }
+          echo '> x<sup>4</sup> + <input type="number" name="d3" ';
           if (isset($_POST['d3'])) {
             echo 'value="'.$_POST['d3'].'"';
           }
@@ -89,11 +107,19 @@
       </div>
       <div id="ph1">';
 
-  if (isset($_POST['n3']) && isset($_POST['n2']) && isset($_POST['n1']) && isset($_POST['n0']) && isset($_POST['d3']) && isset($_POST['d2']) && isset($_POST['d1']) && isset($_POST['d0'])) {
+  if (
+    isset($_POST['n5']) && isset($_POST['n4']) && isset($_POST['n3']) && isset($_POST['n2']) && isset($_POST['n1']) && isset($_POST['n0'])
+    &&
+    isset($_POST['d5']) && isset($_POST['d4']) && isset($_POST['d3']) && isset($_POST['d2']) && isset($_POST['d1']) && isset($_POST['d0'])
+  ) {
+    $n[5] = $_POST['n5'];
+    $n[4] = $_POST['n4'];
     $n[3] = $_POST['n3'];
     $n[2] = $_POST['n2'];
     $n[1] = $_POST['n1'];
     $n[0] = $_POST['n0'];
+    $d[5] = $_POST['d5'];
+    $d[4] = $_POST['d4'];
     $d[3] = $_POST['d3'];
     $d[2] = $_POST['d2'];
     $d[1] = $_POST['d1'];
@@ -141,11 +167,39 @@
 
     //FUNCTIONS
       //DIVISIONE COME FRAZIONE
-      function frac($num, $den) {
+      function frac1($num, $den) {
         $gcd = gmp_gcd($num, $den);
         $num = $num / $gcd;
         $den = $den / $gcd;
         return '<div class="frac"><span>'.$num.'</span><span class="symbol">/</span><span class="bottom">'.$den.'</span></div>';
+      }
+      function frac2($n, $tolerance = 1.e-6) {
+        $frac_temp = 0;
+        if ($n < 0) {
+          $n = -1 * $n;
+          $frac_temp = 1;
+        }
+        $h1=1; $h2=0;
+        $k1=0; $k2=1;
+        $b = 1/$n;
+        do {
+            $b = 1/$b;
+            $a = floor($b);
+            $aux = $h1; $h1 = $a*$h1+$h2; $h2 = $aux;
+            $aux = $k1; $k1 = $a*$k1+$k2; $k2 = $aux;
+            $b = $b-$a;
+        } while (abs($n-$h1/$k1) > $n*$tolerance);
+        if ($k1 == 1) {
+          if ($frac_temp == 1) {
+            return '-'.$h1;
+          } else {
+            return $h1;
+          }
+        } elseif ($frac_temp == 1) {
+          return '-<div class="frac"><span>'.$h1.'</span><span class="symbol">/</span><span class="bottom">'.$k1.'</span></div>';
+        } else {
+          return '<div class="frac"><span>'.$h1.'</span><span class="symbol">/</span><span class="bottom">'.$k1.'</span></div>';
+        }
       }
       //STAMPA POLINOMIO
       function echo_pol($array) {
@@ -155,21 +209,21 @@
         foreach ($array as $key => $value) {
           if ($key == 0) {
             if ($value > 0 && $k == 1) {
-              echo ' + '.$value;
+              echo ' + '.frac2($value);
             } elseif (($value < 0 && $k == 1) || ($value != 0 && $k == 0)) {
-              echo $value;
+              echo frac2($value);
             }
           } elseif ($key == 1) {
             if ($value > 0 && $k == 1) {
-              echo ' + '.$value.'x';
+              echo ' + '.frac2($value).'x';
             } elseif (($value < 0 && $k == 1) || ($value != 0 && $k == 0)) {
-              echo $value.'x';
+              echo frac2($value).'x';
             }
           } else {
             if ($value > 0 && $k == 1) {
-              echo ' + '.$value.'x<sup>'.$key.'</sup>';
+              echo ' + '.frac2($value).'x<sup>'.$key.'</sup>';
             } elseif (($value < 0 && $k == 1) || ($value != 0 && $k == 0)) {
-              echo $value.'x<sup>'.$key.'</sup>';
+              echo frac2($value).'x<sup>'.$key.'</sup>';
             }
           }
           $k = 1;
@@ -317,7 +371,8 @@
             $count = 1;
           }
           if ($print) {
-            echo '</tr><table>';
+            echo '
+          </table>';
           }
           return $q;
         }
@@ -346,7 +401,26 @@
           }
           return $der;
         }
-
+        //INTEGRALE DI UN POLINOMIO
+        function integral($poly) {
+          $poly = poly_cls($poly);
+          foreach ($poly as $key => $value) {
+            if ($key != -1) {
+              $integral_poly[$key + 1] = $value / ($key + 1);
+            } else {
+              if ($value < 0) {
+                $integral_ln = $value.' * ln|x|';
+              } else {
+                $integral_ln = ' + '.$value.' * ln|x|';
+              }
+            }
+          }
+          if (isset($integral_ln)) {
+            return echo_pol($integral_poly).' '.$integral_ln;
+          } else {
+            return echo_pol($integral_poly);
+          }
+        }
     //TROVO IL GRADO DI N(x) E DI D(x)
       //N(x)
       $grado_n = grado($n);
@@ -361,17 +435,158 @@
       echo 'Calcoliamo il quoziente e il resto della divisione polinomiale tra N(x) e D(x):<br><br>';
       $q = quoz($n, $d, true);
       $r = resto($n, $d);
-      echo '<br>Q(x)=';
+      echo '<br>
+          Q(x)=';
       echo_pol($q);
-      echo '<br>R(x)=';
+      echo '<br>
+          R(x)=';
       echo_pol($r);
-      echo '<br><br>Il rapporto N(x)/D(x) pu&ograve; essere scritto nel modo seguente:<br>Q(x) + R(x)/D(x) = ';
-      echo_pol($q);
-      echo ' + (';
-      echo_pol($r);
-      echo ') / (';
-      echo_pol($d);
-      echo ')';
+      echo '<br><br>
+          Il rapporto
+          <div class="frac">
+            <span>
+              N(x)
+            </span>
+            <span class="symbol">
+              /
+            </span>
+            <span class="bottom">
+              D(x)
+            </span>
+          </div>
+          pu&ograve; essere scritto nel modo seguente:
+          <center>
+            Q(x) +
+            <div class="frac">
+              <span>
+                R(x)
+              </span>
+              <span class="symbol">
+                /
+              </span>
+              <span class="bottom">
+                D(x)
+              </span>
+            </div>
+             = ';
+      echo_pol(poly_cls($q));
+      echo ' +
+            <div class="frac">
+              <span>
+                ';
+      echo_pol(poly_cls($r));
+      echo '
+              </span>
+              <span class="symbol">
+                /
+                </span>
+                <span class="bottom">
+                ';
+      echo_pol(poly_cls($d));
+      echo '
+              </span>
+              </div>
+          </center>';
+      //IL RESTO È LA DERIVATA DEL DENOMINATORE
+      $r = poly_cls($r);
+      $d = poly_cls($d);
+      if (count(poly_cls(quoz(der($d), $r, false))) <= 1 && empty(poly_cls(resto(der($d), $r)))) {
+        echo '<br>
+          Il resto è la derivata del denominatore:
+          <center>
+            D[';
+        echo_pol($d);
+        echo '] = ';
+        echo_pol(der($d));
+        if (poly_cls(quoz(der($d), $r, false))[0] != 1) {
+          echo ' = '.frac2(poly_cls(quoz(der($d), $r, false))[0]).' * (';
+          echo_pol($r);
+          echo ')';
+        }
+        echo '
+        </center>
+        Quindi:
+        <center>
+          &#8747;
+          <div class="frac">
+            <span>
+              ';
+        echo_pol($r);
+        echo '
+            </span>
+            <span class="symbol">
+              /
+            </span>
+            <span class="bottom">
+              ';
+        echo_pol($d);
+        echo '
+            </span>
+          </div>
+          dx';
+        if (poly_cls(quoz(der($d), $r, false))[0] != 1) {
+          echo ' = '.frac2(poly_cls(quoz($r, der($d), false))[0]).' * &#8747; <div class="frac"><span>';
+          echo_pol(der($d));
+          echo '</span><span class="symbol">/</span><span class="bottom">';
+          echo_pol($d);
+          echo '</span></div> dx';
+          echo ' = '.frac2(poly_cls(quoz($r, der($d), false))[0]).' * ln|';
+        } else {
+          echo ' = ln|';
+        }
+        echo_pol(poly_cls($d));
+        echo '| + c
+        </center>
+        Quindi:
+        <center>
+          &#8747;
+          <div class="frac">
+            <span>
+              ';
+        echo_pol(poly_cls($n));
+        echo '
+            </span>
+            <span class="symbol">
+              /
+            </span>
+            <span class="bottom">
+              ';
+        echo_pol(poly_cls($d));
+        echo '
+            </span>
+          </div>
+          dx = &#8747; ';
+        echo_pol(poly_cls($q));
+        echo ' dx + &#8747;
+          <div class="frac">
+            <span>
+              ';
+        echo_pol(poly_cls($r));
+        echo '
+            </span>
+            <span class="symbol">
+              /
+            </span>
+            <span class="bottom">
+              ';
+        echo_pol(poly_cls($d));
+        echo '
+            </span>
+          </div> dx = <b>';
+        echo integral($q);
+        if (poly_cls(quoz(der($d), $r, false))[0] != 1) {
+          if (poly_cls(quoz($r, der($d), false))[0] >= 0) {
+            echo ' + '.frac2(poly_cls(quoz($r, der($d), false))[0]).' * ln|';
+          } else {
+            echo frac2(poly_cls(quoz($r, der($d), false))[0]).' * ln|';
+          }
+        } else {
+          echo ' + ln|';
+        }
+        echo_pol(poly_cls($d));
+        echo '| + c</b>
+        </center>';
+      }
     }
   //grado_d < grado_n
     else {
@@ -380,13 +595,14 @@
       $n = poly_cls($n);
       $d = poly_cls($d);
       if (count(poly_cls(quoz(der($d), $n, false))) <= 1 && empty(poly_cls(resto(der($d), $n)))) {
-        echo '<b>Il numeratore è la derivata del denominatore</b>:<center>D[';
+        echo 'Il numeratore è la derivata del denominatore:<center>D[';
         echo_pol($d);
         echo '] = ';
         echo_pol(der($d));
         if (poly_cls(quoz(der($d), $n, false))[0] != 1) {
-          echo ' = '.poly_cls(quoz(der($d), $n, false))[0].' * ';
+          echo ' = '.frac2(poly_cls(quoz(der($d), $n, false))[0]).' * (';
           echo_pol($n);
+          echo ')';
         }
         echo '</center>Quindi:<center>&#8747; <div class="frac"><span>';
         echo_pol($n);
@@ -394,22 +610,26 @@
         echo_pol($d);
         echo '</span></div> dx';
         if (poly_cls(quoz(der($d), $n, false))[0] != 1) {
-          echo ' = '.poly_cls(quoz($n, der($d), false))[0].' * &#8747; <div class="frac"><span>';
+          echo ' = '.frac2(poly_cls(quoz($n, der($d), false))[0]).' * &#8747; <div class="frac"><span>';
           echo_pol(der($d));
           echo '</span><span class="symbol">/</span><span class="bottom">';
           echo_pol($d);
           echo '</span></div> dx';
+          echo ' = <b>'.frac2(poly_cls(quoz($n, der($d), false))[0]).' * ln|';
+        } else {
+          echo ' = <b>ln|';
         }
-        echo ' = '.poly_cls(quoz($n, der($d), false))[0].' * ln|';
         echo_pol($d);
-        echo '| + c';
+        echo '| + c</b>';
       }
+      //IL DENOMINATORE È DI PRIMO GRADO
     }
   } else {
     echo '       <div id="phTitle"><b>OUTPUT</b></div>
       Inserire i dati richiesti nella sezione input!';
   }
       echo '
+      </div>
     </div>
   </body>
 </html>
