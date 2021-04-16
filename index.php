@@ -30,7 +30,7 @@
     <div id="titleBackground">
     </div>
     <div id="title">'.$Title.'
-      <div style="color:#BDBDBD;font-size:15px;">Della Giustina Lorenzo &emsp;&emsp;&emsp; '.$Class.' &emsp;&emsp; '.$Date.'</div>
+      <div style="color:#BDBDBD;font-size:15px;">Della Giustina Lorenzo, Hasa Matteo &emsp;&emsp;&emsp; '.$Class.' &emsp;&emsp; '.$Date.'</div>
     </div>
     <div id="navbar">
 			<div id="navTitle">'.$Title.'
@@ -38,7 +38,7 @@
 			<div id="navDate">'.$Date.'
 			</div>
 			<div id="navName">
-				Della Giustina Lorenzo
+				Della Giustina Lorenzo, Hasa Matteo
 			</div>
 		</div>
     <div id="content">
@@ -285,111 +285,123 @@
         return $molt;
       }
       //DIVISIONE TRA POLINOMI
+
         //QUOZIENTE
         function quoz($num, $den, $print) {
-          $temp_prev = $num;
-          $grado_temp = grado($num);
-          $grado_den = grado($den);
-          while ($grado_temp >= $grado_den) {
-            $q[$grado_temp - $grado_den] = $temp_prev[$grado_temp] / $den[$grado_den];
-            $temp = molt($q[$grado_temp - $grado_den], $grado_temp - $grado_den, $den);
-            $temp = diff($temp_prev, $temp);
-            $grado_temp = grado($temp);
-            $temp_prev = $temp;
-            unset($temp);
-            $count = 1;
-          }
-          $q_temp = $q;
-          unset($q);
-          unset($temp_prev);
-          unset($grado_temp);
-          $temp_prev = $num;
-          $grado_temp = grado($num);
-          if ($print) {
-            echo '
-          <table>
-            <tr class="quoz">
-              <td class="quoz">';
-            echo_pol($temp_prev);
-            echo '
-              </td>
-              <td class="quoz">';
-            echo_pol($den);
-            echo '
-              </td>
-            </tr>';
-          }
-          $count = 0;
-          while ($grado_temp >= $grado_den) {
-            $q[$grado_temp - $grado_den] = $temp_prev[$grado_temp] / $den[$grado_den];
-            $temp = molt($q[$grado_temp - $grado_den], $grado_temp - $grado_den, $den);
-            if ($print) {
-              if ($count == 0) {
-                echo '
-            <tr class="quoz">
-              <td class="quoz">
-                - (';
-                echo_pol($temp);
-                echo '
-                )
-              </td>
-              <td class="quoz">';
-                echo_pol($q_temp);
-              echo '
-              </td>
-            </tr>';
-              } else {
-                echo '
-            <tr class="quoz">
-              <td class="quoz">
-                - (';
-                echo_pol($temp);
-                echo '
-                )
-              </td>
-            </tr>';
-              }
+          if (grado(poly_cls($num)) == 0 && grado(poly_cls($num)) == 0) {
+            $q[0] = $num[0] / $den[0];
+            return $q;
+          } else {
+            $temp_prev = $num;
+            $grado_temp = grado($num);
+            $grado_den = grado($den);
+
+            while ($grado_temp >= $grado_den) {
+              $q[$grado_temp - $grado_den] = $temp_prev[$grado_temp] / $den[$grado_den];
+              $temp = molt($q[$grado_temp - $grado_den], $grado_temp - $grado_den, $den);
+              $temp = diff($temp_prev, $temp);
+              $grado_temp = grado($temp);
+              $temp_prev = $temp;
+              unset($temp);
+              $count = 1;
             }
-            $temp = diff($temp_prev, $temp);
-            $grado_temp = grado($temp);
-            $temp_prev = $temp;
-            unset($temp);
+            $q_temp = $q;
+            unset($q);
+            unset($temp_prev);
+            unset($grado_temp);
+            $temp_prev = $num;
+            $grado_temp = grado($num);
             if ($print) {
               echo '
+            <table>
               <tr class="quoz">
                 <td class="quoz">';
-              $temp_prev = poly_cls($temp_prev);
-              if (empty($temp_prev)){
-                echo '0';
-              } else {
-                echo_pol($temp_prev);
-              }
+              echo_pol($temp_prev);
               echo '
-              </td>
-            </tr>';
+                </td>
+                <td class="quoz">';
+              echo_pol($den);
+              echo '
+                </td>
+              </tr>';
             }
-            $count = 1;
+            $count = 0;
+            while ($grado_temp >= $grado_den) {
+              $q[$grado_temp - $grado_den] = $temp_prev[$grado_temp] / $den[$grado_den];
+              $temp = molt($q[$grado_temp - $grado_den], $grado_temp - $grado_den, $den);
+              if ($print) {
+                if ($count == 0) {
+                  echo '
+              <tr class="quoz">
+                <td class="quoz">
+                  - (';
+                  echo_pol($temp);
+                  echo '
+                  )
+                </td>
+                <td class="quoz">';
+                  echo_pol($q_temp);
+                echo '
+                </td>
+              </tr>';
+                } else {
+                  echo '
+              <tr class="quoz">
+                <td class="quoz">
+                  - (';
+                  echo_pol($temp);
+                  echo '
+                  )
+                </td>
+              </tr>';
+                }
+              }
+              $temp = diff($temp_prev, $temp);
+              $grado_temp = grado($temp);
+              $temp_prev = $temp;
+              unset($temp);
+              if ($print) {
+                echo '
+                <tr class="quoz">
+                  <td class="quoz">';
+                $temp_prev = poly_cls($temp_prev);
+                if (empty($temp_prev)){
+                  echo '0';
+                } else {
+                  echo_pol($temp_prev);
+                }
+                echo '
+                </td>
+              </tr>';
+              }
+              $count = 1;
+            }
+            if ($print) {
+              echo '
+            </table>';
+            }
+            return $q;
           }
-          if ($print) {
-            echo '
-          </table>';
-          }
-          return $q;
         }
         //RESTO
         function resto($num, $den) {
-          $temp_prev = $num;
-          $grado_temp = grado($num);
-          $grado_den = grado($den);
-          while ($grado_temp >= $grado_den) {
-            $q[$grado_temp - $grado_den] = $temp_prev[$grado_temp] / $den[$grado_den];
-            $temp = molt($q[$grado_temp - $grado_den], $grado_temp - $grado_den, $den);
-            $temp = diff($temp_prev, $temp);
-            $grado_temp = grado($temp);
-            $temp_prev = $temp;
-            unset($temp);
+          if (grado(poly_cls($num)) == 0 && grado(poly_cls($num)) == 0) {
+            $r[0] = 0;
+            return $r;
+          } else {
+            $temp_prev = $num;
+            $grado_temp = grado($num);
+            $grado_den = grado($den);
+            while ($grado_temp >= $grado_den) {
+              $q[$grado_temp - $grado_den] = $temp_prev[$grado_temp] / $den[$grado_den];
+              $temp = molt($q[$grado_temp - $grado_den], $grado_temp - $grado_den, $den);
+              $temp = diff($temp_prev, $temp);
+              $grado_temp = grado($temp);
+              $temp_prev = $temp;
+              unset($temp);
+            }
+            return $temp_prev;
           }
-          return $temp_prev;
         }
         //DERIVATA DI UN POLINOMIO
         function der($poly) {
@@ -490,6 +502,10 @@
       //IL RESTO È LA DERIVATA DEL DENOMINATORE
       $r = poly_cls($r);
       $d = poly_cls($d);
+      //print_r($r);
+      //print_r(quoz(der($d), $r, false));
+      //echo_pol(quoz($n, $d, false));
+
       if (count(poly_cls(quoz(der($d), $r, false))) <= 1 && empty(poly_cls(resto(der($d), $r)))) {
         echo '<br>
           Il resto è la derivata del denominatore:
@@ -588,12 +604,14 @@
         </center>';
       }
     }
-  //grado_d < grado_n
+  //grado_d > grado_n
     else {
       echo 'Il grado di N(x) &egrave; minore a quello di D(x).<br><br>';
       //IL NUMERATORE È LA DERIVATA DEL DENOMINATORE
       $n = poly_cls($n);
       $d = poly_cls($d);
+      print_r(der($d));
+      print_r($n);
       if (count(poly_cls(quoz(der($d), $n, false))) <= 1 && empty(poly_cls(resto(der($d), $n)))) {
         echo 'Il numeratore è la derivata del denominatore:<center>D[';
         echo_pol($d);
